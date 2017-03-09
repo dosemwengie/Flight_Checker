@@ -1,0 +1,81 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block doc %}
+<!DOCTYPE html>
+
+{% block html %}
+<html>
+
+{% block head %}
+<HEAD>
+
+{% block metas %}
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+{% block scripts %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<style>
+{% endblock %}
+
+
+body{
+background-color:#40506f;	
+color:black;
+}
+.f{
+padding:2px;
+}
+.g{
+	border-radius: 25px;
+	padding: 5px 10px 0px 12px;
+}
+.altback {
+	background-color:#6a896f;
+}
+h1{
+	text-align:center;
+}
+.j_back{
+	background-color:#3481ff;
+}
+
+</style>
+{% endblock %}
+</HEAD>
+{% endblock %}
+
+{% block body %}
+<body>
+	<nav class="navbar navbar-inverse f">
+		<div class="container-fluid g">
+			<div class="navbar-header">
+			<a class="navbar-brand" href="#" style="color:black;background-color:#6a896f;border-radius:25px">Flight Checker</a>
+		</div>
+		<ul class="nav navbar-nav navbar-right g">
+			<li><button class="btn btn-lg btn-primary">My Account</button></li>
+			<li><button class="btn btn-lg btn-danger">Logout</button></li>
+		</ul>
+		</div>
+	</nav>
+	<div class="container-fluid row">
+		<div class="jumbotron j_back">
+		<h1>Welcome {{ name }}</h1>
+		</div>
+		<div class="col-md-6 altback panel">
+			<h2 class="text-center">Queries</h2>
+		</div>
+		<div class="col-md-6 panel">
+			<h2 class="text-center">Results</h2>
+		</div>
+	</div>
+
+</body>
+{% endblock %}
+</html>
+{% endblock %}
+{% endblock %}
