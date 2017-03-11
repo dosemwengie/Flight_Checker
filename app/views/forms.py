@@ -17,3 +17,5 @@ class LoginForm(FlaskForm):
 	passw_login= PasswordField('Password',validators=[Required()])
 	submit_login = SubmitField('Login')
 
+class LogoutForm(FlaskForm):
+	submit_login=SubmitField("Logout")

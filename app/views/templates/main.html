@@ -58,7 +58,8 @@ h1{
 		</div>
 		<ul class="nav navbar-nav navbar-right g">
 			<li><button class="btn btn-lg btn-primary">My Account</button></li>
-			<li><button class="btn btn-lg btn-danger">Logout</button></li>
+			<li>{{ wtf.quick_form(logoutForm,button_map={'submit_login':'danger'}) }}</li>
+			
 		</ul>
 		</div>
 	</nav>
