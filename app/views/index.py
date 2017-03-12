@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import login_user,logout_user,UserMixin,LoginManager,login_required
 from forms import ForgotForm,SignUp,LoginForm,LogoutForm
 from __init__ import *
+import os
 
 app=Flask(__name__)
 login_manager.init_app(app)
@@ -58,6 +59,7 @@ def login(l_login):
 	passw_login=l_login.passw_login.data
 	found_user=db.users.find_one({"$or":[{"email":email_login},{"username":email_login}]})
 	result,error=None,None
+	print found_user
 	if found_user is not None and check_password_hash(found_user.get("password"),passw_login):
 		username=found_user.get("username")
 		u=User(username)
@@ -119,4 +121,6 @@ def logging_out():
 	return redirect(url_for('index'))
 
 if __name__=='__main__':
-	app.run(debug=True)
+	port=os.getenv("PORT","5000")
+	IP=os.getenv("IP","127.0.0.1")
+	app.run(host=IP,port=int(port),debug=True)
