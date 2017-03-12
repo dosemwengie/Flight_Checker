@@ -9,10 +9,7 @@ from flask_login import login_user,logout_user,UserMixin,LoginManager,login_requ
 from forms import ForgotForm,SignUp,LoginForm,LogoutForm
 from __init__ import *
 
-
-
 app=Flask(__name__)
-#login_manager=LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY']='abunchofmaloneybologna'
 bootstrap=Bootstrap(app)
@@ -25,73 +22,76 @@ a.pop()
 
 @login_manager.user_loader
 def load_user(email):
-	a=db.users.find_one({'email':email})['email']
-	return User(a)
+	a=db.users.find_one({"$or":[{'email':email},{"username":email}]})
+	return User(a.get('username')) if a else None
 	
 class User(UserMixin):
 	def __init__(self,email):
 		super(User,self).__init__()
 		self.id=email
 	
-	
-	
-		
 @app.route('/',methods=['GET','POST'])
 def index():
 	email=None
+	result,err=None,None
 	f_form=ForgotForm()
 	s_form=SignUp()
 	l_login=LoginForm()
-	if l_login.validate_on_submit():
-		return login(l_login)
+	if l_login.email_login.data and l_login.validate_on_submit():
+		result,err=login(l_login)
+		l_login.email_login.data=''
 		
-	elif f_form.validate_on_submit():
-		return forgot(f_form)
+	elif f_form.email_f.data and  f_form.validate_on_submit():
+		result,err=forgot(f_form)
+		f_form.email_f.data=''
 		
-	elif s_form.validate_on_submit():
-		return signup(s_form)
 		
-	return render_template('fc.html',f_form=f_form,s_form=s_form,login_form=l_login)
+	elif s_form.email_s.data and s_form.validate_on_submit():
+		result,err=signup(s_form)
+		s_form.email_s.data=''
+		
+	return result if result else render_template('fc.html',f_form=f_form,s_form=s_form,login_form=l_login,error=err)
 	
-	
-	
+		
 def login(l_login):
 	email_login=l_login.email_login.data
 	passw_login=l_login.passw_login.data
-	found_user=db.users.find_one({"email":email_login})
-	print found_user
+	found_user=db.users.find_one({"$or":[{"email":email_login},{"username":email_login}]})
+	result,error=None,None
 	if found_user is not None and check_password_hash(found_user.get("password"),passw_login):
-		u=User(email_login)
+		username=found_user.get("username")
+		u=User(username)
 		login_user(u)
-		print("Going to homepage")
-		return redirect(url_for("homepage",name=email_login))
+		result=redirect(url_for("homepage",name=username))
 	else:
-		print("Invalid User")
-		flash("Invalid User")
-	return
+		error="Invalid Username/Password"
+	return (result,error)
 	
 	
 def forgot(f_form):
 	email=f_form.email_f.data
-	f_form.email_f.data=''
-	return
+	result,err=check_and_send(email)
+	return result,err
 
 def signup(s_form):
 	email=s_form.email_s.data
 	passw=s_form.passw.data
-	s_form.email_s.data=''
-	found_user=db.users.find_one({"email":email})
-	print(found_user)
+	username=s_form.username.data
+	found_user=db.users.find_one({ "$or":[{"email":email},{"username":username}]})
 	if found_user is None:
-		db.users.insert({"email":email,"password":generate_password_hash(passw)})
-		new_user=User(email)
+		db.users.insert({"email":email,"username":username,"password":generate_password_hash(passw)})
+		new_user=User(username)
 		login_user(new_user)
-		print "created User"
-		return redirect(url_for(homepage,name=email))
+		return None,"Account successfully created! Please Login"
+	return None,"Email/Username already taken!"
+
+def check_and_send(email):
+	rec=db.users.find_one({'email':email})
+	if rec:
+		#send_email
+		return "Email Sent",None
 	else:
-		print("Email %s already taken!"%(email))
-		flash("Email %s already taken!"%(email))
-	return
+		return None,"Email not found"
 
 @app.route('/debug')
 def home():
@@ -104,9 +104,11 @@ def home():
 @app.route('/login',methods=['GET','POST'])
 @login_required
 def homepage():
-	name=request.args.get('name')
+	print "Made it to login"
+	name=request.args.get('name').capitalize()
 	l_out=LogoutForm()
 	if l_out.validate_on_submit():
+		print("Loggin Out!")
 		return redirect(url_for("logging_out"))
 	return render_template('main.html',name=name,logoutForm=l_out)
 
