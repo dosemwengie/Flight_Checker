@@ -97,10 +97,11 @@ def check_and_send(email):
 
 @app.route('/debug')
 def home():
-	u=mongo.db.user.find()
+	u=mongo.db.users.find()
 	for i in u:
-		print i.get('name')
-	return render_template('main.html')
+		print i
+	return redirect(url_for('index'))
+	#return render_template('main.html')
 
 
 @app.route('/login',methods=['GET','POST'])
