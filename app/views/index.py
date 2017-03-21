@@ -1,14 +1,12 @@
 from flask_bootstrap import Bootstrap
-from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField
-from wtforms.validators import Email,Required,EqualTo
 from flask import Flask,render_template,url_for,redirect,flash,request
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import login_user,logout_user,UserMixin,LoginManager,login_required
-from forms import ForgotForm,SignUp,LoginForm,LogoutForm
+from forms import ForgotForm,SignUp,LoginForm,LogoutForm,FlightForm
 from __init__ import *
 import os
+from datetime import datetime
 
 app=Flask(__name__)
 login_manager.init_app(app)
@@ -41,18 +39,13 @@ def index():
 	if l_login.email_login.data and l_login.validate_on_submit():
 		result,err=login(l_login)
 		l_login.email_login.data=''
-		
 	elif f_form.email_f.data and  f_form.validate_on_submit():
 		result,err=forgot(f_form)
-		f_form.email_f.data=''
-		
-		
+		f_form.email_f.data=''	
 	elif s_form.email_s.data and s_form.validate_on_submit():
 		result,err=signup(s_form)
 		s_form.email_s.data=''
-		
 	return result if result else render_template('fc.html',f_form=f_form,s_form=s_form,login_form=l_login,error=err)
-	
 		
 def login(l_login):
 	email_login=l_login.email_login.data
@@ -68,8 +61,7 @@ def login(l_login):
 	else:
 		error="Invalid Username/Password"
 	return (result,error)
-	
-	
+		
 def forgot(f_form):
 	email=f_form.email_f.data
 	result,err=check_and_send(email)
@@ -95,25 +87,35 @@ def check_and_send(email):
 	else:
 		return None,"Email not found"
 
-@app.route('/debug')
+@app.route('/debug',methods=['GET','POST'])
 def home():
+	print request.args.items()
 	u=mongo.db.users.find()
 	for i in u:
 		print i
 	return redirect(url_for('index'))
-	#return render_template('main.html')
-
 
 @app.route('/login',methods=['GET','POST'])
 @login_required
 def homepage():
+	f=FlightForm()
 	print "Made it to login"
 	name=request.args.get('name').capitalize()
 	l_out=LogoutForm()
-	if l_out.validate_on_submit():
+	queries=db.criteria.find({"name":name})
+	#print(dir(queries))
+	if f.validate_on_submit():
+		date_from=datetime.fromordinal(f.date_from.data.toordinal())
+		date_to=datetime.fromordinal(f.date_to.data.toordinal())
+		origin=f.origin.data
+		destination=f.destination.data
+		price=f.target.data
+		db.criteria.update({"name":name},{"$push":{"queries":{"date_from":date_from,"date_to":date_to,"origin":origin,"destination":destination,"price":price}}},upsert=True)
+	if l_out.submit_login.data and l_out.validate_on_submit():
+		#if l_out.validate_on_submit():
 		print("Loggin Out!")
 		return redirect(url_for("logging_out"))
-	return render_template('main.html',name=name,logoutForm=l_out)
+	return render_template('main.html',name=name,flightForm=f,logoutForm=l_out,queries=queries)
 
 
 @app.route('/logout')

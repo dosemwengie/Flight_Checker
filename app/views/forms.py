@@ -1,7 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField
+from wtforms import StringField,PasswordField,SubmitField,DateField,FloatField
 from wtforms.validators import Email,Required,EqualTo
 
+class FlightForm(FlaskForm):
+	date_from=DateField('Depart',format="%m/%d/%Y",validators=[Required()])
+	date_to=DateField('Return',format="%m/%d/%Y")
+	origin=StringField('From',validators=[Required()])
+	destination=StringField('To',validators=[Required()])
+	target=StringField('Target Price',validators=[Required(),FloatField])
+	submit=SubmitField("Submit")
 class ForgotForm(FlaskForm):
 	email_f = StringField('forgotten_email',validators=[Required(),Email()])
 	submit = SubmitField('Submit')
