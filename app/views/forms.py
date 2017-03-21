@@ -10,7 +10,7 @@ class FlightForm(FlaskForm):
 	target=StringField('Target Price',validators=[Required(),FloatField])
 	submit=SubmitField("Submit")
 class ForgotForm(FlaskForm):
-	email_f = StringField('forgotten_email',validators=[Required(),Email()])
+	email_f = StringField('Email',validators=[Required(),Email()])
 	submit = SubmitField('Submit')
 
 class SignUp(FlaskForm):
