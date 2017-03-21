@@ -15,3 +15,5 @@ Miscellaneous scripts:
 clean_up: remove flight criteria and results of past dates.
 run_54: sends reminder to user when flights are 54 days out(optimal prices in many cases, but not always true)
 
+![Login](https://github.com/dosemwengie/Flight_Checker/blob/master/img/login.png)
+![Homepage](https://github.com/dosemwengie/Flight_Checker/blob/master/img/homepage.png)
