@@ -99,11 +99,9 @@ def home():
 @login_required
 def homepage():
 	f=FlightForm()
-	print "Made it to login"
 	name=request.args.get('name').capitalize()
 	l_out=LogoutForm()
 	queries=db.criteria.find({"name":name})
-	#print(dir(queries))
 	if f.validate_on_submit():
 		date_from=datetime.fromordinal(f.date_from.data.toordinal())
 		date_to=datetime.fromordinal(f.date_to.data.toordinal())
@@ -112,8 +110,7 @@ def homepage():
 		price=f.target.data
 		db.criteria.update({"name":name},{"$push":{"queries":{"date_from":date_from,"date_to":date_to,"origin":origin,"destination":destination,"price":price}}},upsert=True)
 	if l_out.submit_login.data and l_out.validate_on_submit():
-		#if l_out.validate_on_submit():
-		print("Loggin Out!")
+		print("Logging Out!")
 		return redirect(url_for("logging_out"))
 	return render_template('main.html',name=name,flightForm=f,logoutForm=l_out,queries=queries)
 
