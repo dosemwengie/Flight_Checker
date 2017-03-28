@@ -140,7 +140,32 @@ h1{
 			<div class="panel-heading">
 				<h4 class="text-center">Results</h4>
 			</div>
-			<div class="panel-body">Result 1
+			<div class="panel-body">
+			<table class="table">
+			{% if queries %}
+			<tr>
+			<th>Date From</th>
+                        <th>Date To</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Price</th>
+                        </tr>
+                        {% endif %}
+			{% for result in queries %}
+			<tr>
+				{% for col in result.results %}
+				<td>
+					 {{ col.date_from }}
+                                                 </td>
+                                                 <td>{{ col.date_to }}</td>
+                                                 <td>{{ col.origin }}</td>
+                                                 <td>{{ col.destination }}</td>
+                                                 <td>{{ col.price }}</td>
+                                                 {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                        </table>
+
 			</div>
 		</div>
 	</div>
